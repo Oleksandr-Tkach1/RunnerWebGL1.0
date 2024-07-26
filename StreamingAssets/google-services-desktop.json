@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "154140258400",
+    "firebase_url": "https://satoshidash-167f3-default-rtdb.firebaseio.com",
+    "project_id": "satoshidash-167f3",
+    "storage_bucket": "satoshidash-167f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154140258400:android:3464b54bee668bf2079305",
+        "android_client_info": {
+          "package_name": "com.CryptomeriaLabs.Runner2060"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbgFC9y7W2284MVXytUrhVhZ45VrFGC1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

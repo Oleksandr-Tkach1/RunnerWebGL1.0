@@ -99,6 +99,18 @@
             showBanner: unityShowBanner,
         };
 
+        function clearIndexedDB() {
+            var dbDeleteRequest = indexedDB.deleteDatabase("UnityCache");
+            dbDeleteRequest.onerror = function (event) {
+                console.log("Error deleting database.");
+            };
+            dbDeleteRequest.onsuccess = function (event) {
+                console.log("Database deleted successfully");
+            };
+        }
+
+        clearIndexedDB();
+
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             var meta = document.createElement('meta');
             meta.name = 'viewport';

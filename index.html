@@ -131,7 +131,8 @@
                             fullscreenButton.onclick = () => {
                                 unityInst.SetFullscreen(1);
                             };
-                            resolve();
+                            console.log("Unity initialized successfully");
+                            resolve(unityInst);
                         }).catch((message) => {
                             console.error(message);
                             alert(message);
@@ -177,8 +178,8 @@
         }
 
         // Инициализация Unity перед использованием Telegram аутентификации
-        initializeUnity().then(() => {
-            console.log("Unity initialized successfully");
+        initializeUnity().then((unityInst) => {
+            unityInstance = unityInst;
         }).catch(() => {
             console.error("Failed to initialize Unity");
         });</script>

@@ -100,49 +100,56 @@
         };
 
         function clearIndexedDB() {
-            var dbDeleteRequest = indexedDB.deleteDatabase("UnityCache");
-            dbDeleteRequest.onerror = function (event) {
-                console.log("Error deleting database.");
-            };
-            dbDeleteRequest.onsuccess = function (event) {
-                console.log("Database deleted successfully");
-            };
-        }
-
-        clearIndexedDB();
-
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            var meta = document.createElement('meta');
-            meta.name = 'viewport';
-            meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-            document.getElementsByTagName('head')[0].appendChild(meta);
-            container.className = "unity-mobile";
-            canvas.className = "unity-mobile";
-        } else {
-            canvas.style.width = "960px";
-            canvas.style.height = "600px";
-        }
-
-        loadingBar.style.display = "block";
-
-        var script = document.createElement("script");
-        script.src = loaderUrl;
-        script.onload = () => {
-            createUnityInstance(canvas, config, (progress) => {
-                progressBarFull.style.width = 100 * progress + "%";
-            }).then((unityInstance) => {
-                window.unityInstance = unityInstance;
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                    unityInstance.SetFullscreen(1);
+            return new Promise((resolve, reject) => {
+                var dbDeleteRequest = indexedDB.deleteDatabase("UnityCache");
+                dbDeleteRequest.onerror = function (event) {
+                    console.log("Error deleting database.");
+                    reject(event);
                 };
-            }).catch((message) => {
-                console.error(message);
-                alert(message);
+                dbDeleteRequest.onsuccess = function (event) {
+                    console.log("Database deleted successfully");
+                    resolve();
+                };
             });
-        };
+        }
 
-        document.body.appendChild(script);
+        async function initializeUnity() {
+            await clearIndexedDB();
+
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                var meta = document.createElement('meta');
+                meta.name = 'viewport';
+                meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+                document.getElementsByTagName('head')[0].appendChild(meta);
+                container.className = "unity-mobile";
+                canvas.className = "unity-mobile";
+            } else {
+                canvas.style.width = "960px";
+                canvas.style.height = "600px";
+            }
+
+            loadingBar.style.display = "block";
+
+            var script = document.createElement("script");
+            script.src = loaderUrl;
+            script.onload = () => {
+                createUnityInstance(canvas, config, (progress) => {
+                    progressBarFull.style.width = 100 * progress + "%";
+                }).then((unityInstance) => {
+                    window.unityInstance = unityInstance;
+                    loadingBar.style.display = "none";
+                    fullscreenButton.onclick = () => {
+                        unityInstance.SetFullscreen(1);
+                    };
+                }).catch((message) => {
+                    console.error(message);
+                    alert(message);
+                });
+            };
+            document.body.appendChild(script);
+        }
+
+        initializeUnity();
 
         function sendTelegramDataToUnity(userId, userName) {
             var unityInstance = window.unityInstance;

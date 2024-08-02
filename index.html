@@ -141,6 +141,26 @@
                     fullscreenButton.onclick = () => {
                         unityInstance.SetFullscreen(1);
                     };
+
+                    // Теперь Unity instance должен быть инициализирован, и можно отправить данные в Unity.
+                    function sendTelegramDataToUnity(userId, userName) {
+                        if (unityInstance) {
+                            unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
+                        } else {
+                            console.error('Unity instance not found');
+                        }
+                    }
+
+                    function onTelegramAuth(user) {
+                        alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+                        sendTelegramDataToUnity(user.id, user.first_name + ' ' + user.last_name);
+                        centeredContent.style.display = 'none';
+                        container.style.display = 'block';
+                    }
+
+                    // Подключаем обработчик для Telegram
+                    window.onTelegramAuth = onTelegramAuth;
+
                 }).catch((message) => {
                     console.error(message);
                     alert(message);
@@ -149,22 +169,6 @@
             document.body.appendChild(script);
         }
 
-        initializeUnity();
-
-        function sendTelegramDataToUnity(userId, userName) {
-            var unityInstance = window.unityInstance;
-            if (unityInstance) {
-                unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
-            } else {
-                console.error('Unity instance not found');
-            }
-        }
-
-        function onTelegramAuth(user) {
-            alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-            sendTelegramDataToUnity(user.id, user.first_name + ' ' + user.last_name);
-            centeredContent.style.display = 'none';
-            container.style.display = 'block';
-        }</script>
+        initializeUnity();</script>
 </body>
 </html>

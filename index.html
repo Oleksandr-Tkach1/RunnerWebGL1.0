@@ -1,66 +1,59 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Runner2060</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runner 2060</title>
     <style>
-        #centered-content {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+        #unity-container {
+            width: 960px;
+            height: 600px;
+            margin: auto;
         }
 
-        #unity-container {
-            display: none;
+        #unity-canvas {
+            width: 100%;
+            height: 100%;
+            background: grey;
+        }
+
+        #centered-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
     </style>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
 </head>
 <body>
-    <div id="unity-container" class="unity-desktop">
-        <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-        <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
-                <div id="unity-progress-bar-full"></div>
-            </div>
-        </div>
-        <div id="unity-warning"> </div>
-        <div id="unity-footer">
-            <div id="unity-webgl-logo"></div>
-            <div id="unity-fullscreen-button"></div>
-            <div id="unity-build-title">Runner2060</div>
-        </div>
-    </div>
     <div id="centered-content">
-        <script async src="https://telegram.org/js/telegram-widget.js?22"
-                data-telegram-login="TestAuth34766543_bot"
-                data-size="large"
-                data-onauth="onTelegramAuth(user)"
-                data-request-access="write"></script>
+        <button id="telegram-login-button">Login with Telegram</button>
     </div>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <div id="unity-container" style="display:none;">
+        <div id="unity-loading-bar">
+            <div id="unity-progress-bar-full"></div>
+        </div>
+        <canvas id="unity-canvas"></canvas>
+        <div id="unity-warning"></div>
+        <button id="unity-fullscreen-button">Fullscreen</button>
+    </div>
+    <script src="https://telegram.org/js/telegram-widget.js?19" async></script>
     <script>var unityInstance = null;
+        var telegramUser = null;
+
         function onTelegramAuth(user) {
+            telegramUser = user;
             alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-            sendTelegramDataToUnity(user.id, user.first_name + ' ' + user.last_name);
+            trySendTelegramDataToUnity();
             document.getElementById('centered-content').style.display = 'none';
             document.getElementById('unity-container').style.display = 'block';
         }
 
-        function sendTelegramDataToUnity(userId, userName) {
-            if (unityInstance) {
-                unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
+        function trySendTelegramDataToUnity() {
+            if (unityInstance && telegramUser) {
+                unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', telegramUser.id + ',' + telegramUser.first_name + ' ' + telegramUser.last_name);
             } else {
-                console.error('Unity instance not found');
+                setTimeout(trySendTelegramDataToUnity, 100);
             }
         }
 
@@ -158,6 +151,7 @@
                     fullscreenButton.onclick = () => {
                         unityInst.SetFullscreen(1);
                     };
+                    trySendTelegramDataToUnity();
                 }).catch((message) => {
                     console.error(message);
                     alert(message);

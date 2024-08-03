@@ -14,7 +14,6 @@
             transform: translate(-50%, -50%);
             text-align: center;
         }
-
         #unity-container {
             display: none;
         }
@@ -24,164 +23,174 @@
     <meta http-equiv="Expires" content="0" />
 </head>
 <body>
-    <div id="unity-container" class="unity-desktop">
-        <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-        <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
-                <div id="unity-progress-bar-full"></div>
-            </div>
-        </div>
-        <div id="unity-warning"> </div>
-        <div id="unity-footer">
-            <div id="unity-webgl-logo"></div>
-            <div id="unity-fullscreen-button"></div>
-            <div id="unity-build-title">Runner2060</div>
+<div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+    <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
         </div>
     </div>
-    <div id="centered-content">
-        <script async src="https://telegram.org/js/telegram-widget.js?22"
-                data-telegram-login="TestAuth34766543_bot"
-                data-size="large"
-                data-onauth="onTelegramAuth(user)"
-                data-request-access="write"></script>
+    <div id="unity-warning"> </div>
+    <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">Runner2060</div>
     </div>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
-    <script>var unityInstance = null;
+</div>
+<div id="centered-content">
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="TestAuth34766543_bot"
+            data-size="large"
+            data-onauth="onTelegramAuth(user)"
+            data-request-access="write"></script>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+<script>
+    var unityInstance = null;
+    var telegramUser = null;
 
-        // Функция для инициализации Unity и возврата Promise
-        function initializeUnity() {
-            return new Promise((resolve, reject) => {
-                var container = document.querySelector("#unity-container");
-                var canvas = document.querySelector("#unity-canvas");
-                var loadingBar = document.querySelector("#unity-loading-bar");
-                var progressBarFull = document.querySelector("#unity-progress-bar-full");
-                var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    // Функция для инициализации Unity и возврата Promise
+    function initializeUnity() {
+        return new Promise((resolve, reject) => {
+            var container = document.querySelector("#unity-container");
+            var canvas = document.querySelector("#unity-canvas");
+            var loadingBar = document.querySelector("#unity-loading-bar");
+            var progressBarFull = document.querySelector("#unity-progress-bar-full");
+            var fullscreenButton = document.querySelector("#unity-fullscreen-button");
 
-                function unityShowBanner(msg, type) {
-                    var warningBanner = document.querySelector("#unity-warning");
-                    function updateBannerVisibility() {
-                        warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-                    }
-                    var div = document.createElement('div');
-                    div.innerHTML = msg;
-                    warningBanner.appendChild(div);
-                    if (type == 'error') div.style = 'background: red; padding: 10px;';
-                    else {
-                        if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-                        setTimeout(function () {
-                            warningBanner.removeChild(div);
-                            updateBannerVisibility();
-                        }, 5000);
-                    }
-                    updateBannerVisibility();
+            function unityShowBanner(msg, type) {
+                var warningBanner = document.querySelector("#unity-warning");
+                function updateBannerVisibility() {
+                    warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
                 }
-
-                var buildUrl = "Build";
-                var loaderUrl = buildUrl + "/web.loader.js?v=" + new Date().getTime();
-                var config = {
-                    dataUrl: buildUrl + "/web.data?v=" + new Date().getTime(),
-                    frameworkUrl: buildUrl + "/web.framework.js?v=" + new Date().getTime(),
-                    codeUrl: buildUrl + "/web.wasm?v=" + new Date().getTime(),
-                    streamingAssetsUrl: "StreamingAssets",
-                    companyName: "CryptomeriaLabs",
-                    productName: "Runner2060",
-                    productVersion: "1.0.12",
-                    showBanner: unityShowBanner,
-                };
-
-                function clearIndexedDB() {
-                    return new Promise((resolve, reject) => {
-                        var dbDeleteRequest = indexedDB.deleteDatabase("UnityCache");
-                        dbDeleteRequest.onerror = function (event) {
-                            console.log("Error deleting database.");
-                            reject(event);
-                        };
-                        dbDeleteRequest.onsuccess = function (event) {
-                            console.log("Database deleted successfully");
-                            resolve();
-                        };
-                    });
+                var div = document.createElement('div');
+                div.innerHTML = msg;
+                warningBanner.appendChild(div);
+                if (type == 'error') div.style = 'background: red; padding: 10px;';
+                else {
+                    if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+                    setTimeout(function() {
+                        warningBanner.removeChild(div);
+                        updateBannerVisibility();
+                    }, 5000);
                 }
+                updateBannerVisibility();
+            }
 
-                clearIndexedDB().then(() => {
-                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                        var meta = document.createElement('meta');
-                        meta.name = 'viewport';
-                        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-                        document.getElementsByTagName('head')[0].appendChild(meta);
-                        container.className = "unity-mobile";
-                        canvas.className = "unity-mobile";
-                    } else {
-                        canvas.style.width = "960px";
-                        canvas.style.height = "600px";
-                    }
+            var buildUrl = "Build";
+            var loaderUrl = buildUrl + "/web.loader.js?v=" + new Date().getTime();
+            var config = {
+                dataUrl: buildUrl + "/web.data?v=" + new Date().getTime(),
+                frameworkUrl: buildUrl + "/web.framework.js?v=" + new Date().getTime(),
+                codeUrl: buildUrl + "/web.wasm?v=" + new Date().getTime(),
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "CryptomeriaLabs",
+                productName: "Runner2060",
+                productVersion: "1.0.12",
+                showBanner: unityShowBanner,
+            };
 
-                    loadingBar.style.display = "block";
-
-                    var script = document.createElement("script");
-                    script.src = loaderUrl;
-                    script.onload = () => {
-                        createUnityInstance(canvas, config, (progress) => {
-                            progressBarFull.style.width = 100 * progress + "%";
-                        }).then((unityInst) => {
-                            unityInstance = unityInst;
-                            loadingBar.style.display = "none";
-                            fullscreenButton.onclick = () => {
-                                unityInst.SetFullscreen(1);
-                            };
-                            console.log("Unity initialized successfully");
-                            resolve(unityInst);
-                        }).catch((message) => {
-                            console.error(message);
-                            alert(message);
-                            reject();
-                        });
+            function clearIndexedDB() {
+                return new Promise((resolve, reject) => {
+                    var dbDeleteRequest = indexedDB.deleteDatabase("UnityCache");
+                    dbDeleteRequest.onerror = function(event) {
+                        console.log("Error deleting database.");
+                        reject(event);
                     };
-                    document.body.appendChild(script);
-                }).catch((error) => {
-                    console.error(error);
-                    alert("Failed to clear IndexedDB");
-                    reject();
+                    dbDeleteRequest.onsuccess = function(event) {
+                        console.log("Database deleted successfully");
+                        resolve();
+                    };
                 });
+            }
+
+            clearIndexedDB().then(() => {
+                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    var meta = document.createElement('meta');
+                    meta.name = 'viewport';
+                    meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+                    document.getElementsByTagName('head')[0].appendChild(meta);
+                    container.className = "unity-mobile";
+                    canvas.className = "unity-mobile";
+                } else {
+                    canvas.style.width = "960px";
+                    canvas.style.height = "600px";
+                }
+
+                loadingBar.style.display = "block";
+
+                var script = document.createElement("script");
+                script.src = loaderUrl;
+                script.onload = () => {
+                    createUnityInstance(canvas, config, (progress) => {
+                        progressBarFull.style.width = 100 * progress + "%";
+                    }).then((unityInst) => {
+                        unityInstance = unityInst;
+                        loadingBar.style.display = "none";
+                        fullscreenButton.onclick = () => {
+                            unityInst.SetFullscreen(1);
+                        };
+                        console.log("Unity initialized successfully");
+                        resolve(unityInst);
+                        if (telegramUser) {
+                            sendTelegramDataToUnity(telegramUser.id, telegramUser.first_name + ' ' + telegramUser.last_name);
+                        }
+                    }).catch((message) => {
+                        console.error(message);
+                        alert(message);
+                        reject();
+                    });
+                };
+                document.body.appendChild(script);
+            }).catch((error) => {
+                console.error(error);
+                alert("Failed to clear IndexedDB");
+                reject();
             });
-        }
+        });
+    }
 
-        // Инициализация Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCWGA7w0obawhbuQfwVCv6yqByddbIH1cA",
-            authDomain: "satoshidash-167f3.firebaseapp.com",
-            databaseURL: "https://satoshidash-167f3-default-rtdb.firebaseio.com",
-            projectId: "satoshidash-167f3",
-            storageBucket: "satoshidash-167f3.appspot.com",
-            messagingSenderId: "154140258400",
-            appId: "1:154140258400:web:826313b3102cef2c079305",
-            measurementId: "G-E6CYBRLT7H"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    // Инициализация Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCWGA7w0obawhbuQfwVCv6yqByddbIH1cA",
+        authDomain: "satoshidash-167f3.firebaseapp.com",
+        databaseURL: "https://satoshidash-167f3-default-rtdb.firebaseio.com",
+        projectId: "satoshidash-167f3",
+        storageBucket: "satoshidash-167f3.appspot.com",
+        messagingSenderId: "154140258400",
+        appId: "1:154140258400:web:826313b3102cef2c079305",
+        measurementId: "G-E6CYBRLT7H"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-        function onTelegramAuth(user) {
-            alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-            document.getElementById('centered-content').style.display = 'none';
-            document.getElementById('unity-container').style.display = 'block';
+    function onTelegramAuth(user) {
+        alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+        document.getElementById('centered-content').style.display = 'none';
+        document.getElementById('unity-container').style.display = 'block';
+        telegramUser = user;
+        if (unityInstance) {
             sendTelegramDataToUnity(user.id, user.first_name + ' ' + user.last_name);
         }
+    }
 
-        function sendTelegramDataToUnity(userId, userName) {
-            if (unityInstance) {
-                unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
-            } else {
-                console.error('Unity instance not found');
-            }
+    function sendTelegramDataToUnity(userId, userName) {
+        if (unityInstance) {
+            unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
+        } else {
+            console.error('Unity instance not found');
         }
+    }
 
-        // Инициализация Unity перед использованием Telegram аутентификации
-        initializeUnity().then((unityInst) => {
-            unityInstance = unityInst;
-        }).catch(() => {
-            console.error("Failed to initialize Unity");
-        });</script>
+    // Инициализация Unity перед использованием Telegram аутентификации
+    initializeUnity().then((unityInst) => {
+        unityInstance = unityInst;
+    }).catch(() => {
+        console.error("Failed to initialize Unity");
+    });
+
+</script>
 </body>
 </html>

@@ -131,15 +131,15 @@
                         console.log("Unity initialized successfully");
                         resolve(unityInst);
                     }).catch((message) => {
-                        console.error(message);
-                        alert(message);
+                        console.error("Unity initialization error:", message);
+                        alert("Unity initialization error: " + message);
                         reject();
                     });
                 };
                 document.body.appendChild(script);
             }).catch((error) => {
-                console.error(error);
-                alert("Failed to clear IndexedDB");
+                console.error("Failed to clear IndexedDB:", error);
+                alert("Failed to clear IndexedDB: " + error);
                 reject();
             });
         });

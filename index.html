@@ -39,17 +39,13 @@
     </div>
 </div>
 <div id="centered-content">
-    <script async src="https://telegram.org/js/telegram-widget.js?22"
-            data-telegram-login="TestAuth34766543_bot"
-            data-size="large"
-            data-onauth="onTelegramAuth(user)"
-            data-request-access="write"></script>
+    <!-- Контент для загрузки -->
+    <p>Loading...</p>
 </div>
 <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
 <script>
     var unityInstance = null;
-    var telegramUser = null;
 
     // Функция для инициализации Unity и возврата Promise
     function initializeUnity() {
@@ -134,9 +130,6 @@
                         };
                         console.log("Unity initialized successfully");
                         resolve(unityInst);
-                        if (telegramUser) {
-                            sendTelegramDataToUnity(telegramUser.id, telegramUser.first_name + ' ' + telegramUser.last_name);
-                        }
                     }).catch((message) => {
                         console.error(message);
                         alert(message);
@@ -166,27 +159,11 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function onTelegramAuth(user) {
-        alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-        document.getElementById('centered-content').style.display = 'none';
-        document.getElementById('unity-container').style.display = 'block';
-        telegramUser = user;
-        if (unityInstance) {
-            sendTelegramDataToUnity(user.id, user.first_name + ' ' + user.last_name);
-        }
-    }
-
-    function sendTelegramDataToUnity(userId, userName) {
-        if (unityInstance) {
-            unityInstance.SendMessage('GameManager', 'ReceiveTelegramData', userId + ',' + userName);
-        } else {
-            console.error('Unity instance not found');
-        }
-    }
-
-    // Инициализация Unity перед использованием Telegram аутентификации
+    // Инициализация Unity
     initializeUnity().then((unityInst) => {
         unityInstance = unityInst;
+        document.getElementById('centered-content').style.display = 'none';
+        document.getElementById('unity-container').style.display = 'block';
     }).catch(() => {
         console.error("Failed to initialize Unity");
     });

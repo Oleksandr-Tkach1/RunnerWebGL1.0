@@ -1,7 +1,6 @@
 <linker>
   <assembly fullname="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Assets.SimpleSpinner.SimpleSpinner" preserve="all" />
-    <type fullname="MeshCombiner" preserve="all" />
   </assembly>
   <assembly fullname="Coffee.SoftMaskForUGUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Coffee.UISoftMask.SoftMask" preserve="all" />
@@ -23,7 +22,6 @@
     <type fullname="Satoshi.MiniGames.Runner.AcceptButtonView" preserve="all" />
     <type fullname="Satoshi.MiniGames.Runner.BackButtonProfile" preserve="all" />
     <type fullname="Satoshi.MiniGames.Runner.BaseRunnerView" preserve="all" />
-    <type fullname="Satoshi.MiniGames.Runner.BuildingBacklightHack" preserve="all" />
     <type fullname="Satoshi.MiniGames.Runner.ButtonHome" preserve="all" />
     <type fullname="Satoshi.MiniGames.Runner.ButtonOnTapBunner" preserve="all" />
     <type fullname="Satoshi.MiniGames.Runner.ButtonOpenWeb" preserve="all" />
